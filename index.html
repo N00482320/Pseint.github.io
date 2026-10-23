@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesa de Partes Digital - Pseudocódigo y Diagrama de Flujo</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Mermaid.js para el Diagrama de Flujo -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    pre, code { font-family: 'Fira Code', monospace; }
+    
+    /* Resaltado de Sintaxis PSeInt */
+    .keyword { color: #f43f5e; font-weight: bold; }
+    .type { color: #c084fc; font-weight: bold; }
+    .string { color: #34d399; }
+    .comment { color: #9ca3af; font-style: italic; }
+    .number { color: #fbbf24; }
+
+    /* Estilos para el Zoom del Diagrama */
+    #contenedor-mermaid {
+      transform-origin: top center;
+      transition: transform 0.15s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col p-4 sm:p-6">
+
+  <!-- ENCABEZADO -->
+  <header class="max-w-7xl w-full mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div>
+      <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+        <i class="fa-solid fa-folder-tree text-sky-400"></i>
+        Mesa de Partes Digital
+      </h1>
+      <p class="text-slate-400 text-sm">Sistema Integrado: Pseudocódigo PSeInt y Diagrama de Flujo con Zoom</p>
+    </div>
+    
+    <div class="flex gap-2">
+      <button onclick="copiarCodigo()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-medium border border-slate-700 flex items-center gap-2 transition">
+        <i class="fa-regular fa-copy"></i> Copiar Código PSeInt
+      </button>
+      <button onclick="descargarPSC()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition shadow-lg shadow-sky-900/40">
+        <i class="fa-solid fa-download"></i> Descargar .PSC
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL APILADO -->
+  <main class="max-w-7xl w-full mx-auto flex flex-col gap-8 flex-1">
+    
+    <!-- SECCIÓN 1 (ARRIBA): VISOR DE PSEUDOCÓDIGO -->
+    <section class="bg-slate-950 border border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-xl">
+      <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex justify-between items-center text-xs font-mono text-slate-400">
+        <span class="flex items-center gap-2 text-sm font-semibold text-slate-200">
+          <i class="fa-regular fa-file-code text-sky-400"></i> 1. Pseudocódigo PSeInt (code.psc)
+        </span>
+        <span class="bg-slate-800 px-2.5 py-1 rounded text-slate-300 font-sans">Sintaxis PSeInt</span>
+      </div>
+      
+      <div class="p-4 overflow-auto max-h-[500px] font-mono text-sm leading-relaxed" id="codigo-html">
+        <!-- Código renderizado aquí mediante JavaScript -->
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2 (ABAJO): DIAGRAMA DE FLUJO CON CONTROLES DE ZOOM -->
+    <section class="bg-slate-950 border border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-xl mb-8">
+      <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex justify-between items-center text-xs font-mono text-slate-400">
+        <span class="flex items-center gap-2 text-sm font-semibold text-slate-200">
+          <i class="fa-solid fa-sitemap text-emerald-400"></i> 2. Diagrama de Flujo del Algoritmo (Listo para Word)
+        </span>
+
+        <!-- CONTROLES DE ZOOM -->
+        <div class="flex items-center gap-2 bg-slate-800/80 p-1 rounded-lg border border-slate-700">
+          <button onclick="zoomDiagrama(1.25)" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded font-bold text-xs transition" title="Acercar">
+            <i class="fa-solid fa-magnifying-glass-plus"></i> +
+          </button>
+          <button onclick="zoomDiagrama(0.8)" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded font-bold text-xs transition" title="Alejar">
+            <i class="fa-solid fa-magnifying-glass-minus"></i> -
+          </button>
+          <button onclick="resetZoomDiagrama()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded font-bold text-xs transition" title="Restablecer">
+            <i class="fa-solid fa-rotate-right"></i> Reset
+          </button>
+          <span id="zoom-nivel" class="px-2 font-mono text-slate-300 text-xs">100%</span>
+        </div>
+      </div>
+
+      <!-- VISOR INTERACTIVO CON ZOOM Y RUEDA DEL MOUSE -->
+      <div id="wrapper-diagrama" class="p-6 overflow-auto flex-1 flex justify-center items-start bg-slate-950 min-h-[500px]">
+        <div id="contenedor-mermaid" class="mermaid">
+          graph TD
+              Start([Inicio: Algoritmo MesaDePartesDigital]) --> Init["Inicializar Vectores MAX = 100 y Variables"]
+              Init --> Login["Llamar a login_sistema()"]
+              
+              Login --> SelectRole{"Seleccionar Perfil"}
+              SelectRole -->|1: Admin| SetAdmin["rol_actual = ADMIN"]
+              SelectRole -->|2: Personal| SetPersonal["rol_actual = PERSONAL"]
+              SelectRole -->|3: Ciudadano| SetCitizen["rol_actual = CIUDADANO"]
+
+              SetAdmin --> Loop["Bucle Repetir ... Hasta que opcion = 11"]
+              SetPersonal --> Loop
+              SetCitizen --> Loop
+
+              Loop --> PrintHeader["Mostrar Menu segun Rol Actual"]
+              PrintHeader --> ReadOption["Leer Opcion"]
+
+              ReadOption --> CheckAdmin{"¿Es ADMIN o PERSONAL?"}
+
+              %% Ramas Admin / Personal
+              CheckAdmin -->|Sí| SwitchAdmin["Segun Opcion Hacer"]
+              SwitchAdmin -->|Opción 1| Op1["Registrar Expediente / Validar MAX < 100"]
+              SwitchAdmin -->|Opción 2| Op2["Buscar Expediente por Codigo"]
+              SwitchAdmin -->|Opción 3| Op3["Busqueda Avanzada por DNI/RUC"]
+              SwitchAdmin -->|Opción 4| Op4["Listar Todos los Expedientes"]
+              SwitchAdmin -->|Opción 5| Op5["Modificar Estado de Expediente"]
+              SwitchAdmin -->|Opción 6| Op6{"¿Es ADMIN?"}
+              Op6 -->|Sí| DeleteExp["Eliminar Expediente y Desplazar Vectores"]
+              Op6 -->|No| Denied["Acceso Denegado"]
+              SwitchAdmin -->|Opción 7-11| OpRest["Estadísticas, Exportar, Backup, Ayuda, Salir"]
+
+              %% Rama Ciudadano
+              CheckAdmin -->|No| SwitchCitizen["Segun Opcion Ciudadano"]
+              SwitchCitizen -->|Opción 2| CitOp2["Consultar Estado por Codigo"]
+              SwitchCitizen -->|Opción 3 y 4| CitRest["Restringido / No disponible"]
+              SwitchCitizen -->|Opción 10 y 11| CitEnd["Ayuda y Salir"]
+
+              %% Retorno al Bucle o Fin
+              Op1 --> CheckExit{"¿opcion = 11?"}
+              Op2 --> CheckExit
+              Op3 --> CheckExit
+              Op4 --> CheckExit
+              Op5 --> CheckExit
+              DeleteExp --> CheckExit
+              OpRest --> CheckExit
+              CitOp2 --> CheckExit
+              CitRest --> CheckExit
+              CitEnd --> CheckExit
+
+              CheckExit -->|No| Loop
+              CheckExit -->|Sí| End([Fin del Algoritmo])
+
+              style Start fill:#0284c7,stroke:#fff,stroke-width:2px,color:#fff
+              style End fill:#e11d48,stroke:#fff,stroke-width:2px,color:#fff
+              style Loop fill:#0d9488,stroke:#fff,stroke-width:2px,color:#fff
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // LÓGICA DE ZOOM PARA EL DIAGRAMA DE FLUJO
+    let escalaZoom = 1;
+
+    function zoomDiagrama(factor) {
+      escalaZoom *= factor;
+      escalaZoom = Math.min(Math.max(escalaZoom, 0.3), 3.5); // Limitar entre 30% y 350%
+      aplicarZoom();
+    }
+
+    function resetZoomDiagrama() {
+      escalaZoom = 1;
+      aplicarZoom();
+    }
+
+    function aplicarZoom() {
+      const contenedor = document.getElementById('contenedor-mermaid');
+      contenedor.style.transform = `scale(${escalaZoom})`;
+      document.getElementById('zoom-nivel').innerText = Math.round(escalaZoom * 100) + '%';
+    }
+
+    // Permitir zoom con la Rueda del Mouse (Ctrl + Scroll sobre el diagrama)
+    document.getElementById('wrapper-diagrama').addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        if (e.deltaY < 0) zoomDiagrama(1.1);
+        else zoomDiagrama(0.9);
+      }
+    }, { passive: false });
+
+    // CÓDIGO PSEINT COMPLETO
+    const codigoPsc = `Algoritmo MesaDePartesDigital
+	Definir MAX Como Entero
+	MAX <- 100
+	Definir v_codigo, v_documento, v_remitente, v_asunto, v_fecha, v_estado, v_tipo, v_area, v_obs Como Cadena
+	Dimensionar v_codigo(100), v_documento(100), v_remitente(100), v_asunto(100), v_fecha(100), v_estado(100), v_tipo(100), v_area(100), v_obs(100)
+	Definir total Como Entero
+	total <- 0
+	Definir rol_actual, opcion Como Cadena
+	
+	// Variables auxiliares declaradas al inicio para evitar errores de sintaxis
+	Definir cod_buscar, doc_b, cod_mod, est_op, c_bus Como Cadena
+	Definir hallado Como Logico
+	Definir i, j, k, m, x, l, d Como Entero
+	
+	rol_actual <- login_sistema()
+	
+	Repetir
+		Escribir ''
+		Escribir '=========================================='
+		Escribir ' MESA DE PARTES DIGITAL - PERFIL: [', rol_actual, ']'
+		Escribir '=========================================='
+		
+		Si rol_actual = 'ADMIN' O rol_actual = 'PERSONAL' Entonces
+			Escribir '1. Registrar nuevo expediente'
+			Escribir '2. Buscar expediente por codigo'
+			Escribir '3. Busqueda avanzada / Filtrado'
+			Escribir '4. Ordenar y listar expedientes'
+			Escribir '5. Modificar expediente / Actualizar Estado'
+			Si rol_actual = 'ADMIN' Entonces
+				Escribir '6. Eliminar expediente'
+			FinSi
+			Escribir '7. Estadisticas del Sistema'
+			Escribir '8. Exportar datos a CSV'
+			Escribir '9. Generar Copia de Seguridad'
+			Escribir '10. Menu de Ayuda / FAQ'
+			Escribir '11. Salir del sistema'
+		SiNo
+			Escribir '2. Buscar expediente por codigo'
+			Escribir '3. Busqueda avanzada / Filtrado'
+			Escribir '4. Ordenar y listar expedientes'
+			Escribir '10. Menu de Ayuda / FAQ'
+			Escribir '11. Salir del sistema'
+		FinSi
+		
+		Escribir 'Seleccione una opcion: ' Sin Saltar
+		Leer opcion
+		
+		Si rol_actual = 'ADMIN' O rol_actual = 'PERSONAL' Entonces
+			Segun opcion Hacer
+				'1':
+					Si total < 100 Entonces
+						total <- total + 1
+						v_codigo[total] <- 'EXP-2026-00' + ConvertirATexto(total)
+						v_fecha[total] <- '26/10/2026 10:00'
+						Escribir 'Codigo asignado: ', v_codigo[total]
+						Escribir 'Ingrese DNI (8 digitos) o RUC (11 digitos): ' Sin Saltar
+						Leer v_documento[total]
+						Escribir 'Ingrese Nombre o Razon Social: ' Sin Saltar
+						Leer v_remitente[total]
+						Escribir 'Ingrese Asunto del tramite: ' Sin Saltar
+						Leer v_asunto[total]
+						v_tipo[total] <- 'Tramite General'
+						v_area[total] <- 'Secretaria General'
+						v_estado[total] <- 'PENDIENTE'
+						v_obs[total] <- 'Ninguna'
+						Escribir '[EXITO] Expediente registrado correctamente.'
+					SiNo
+						Escribir '[ERROR] Sistema lleno.'
+					FinSi
+				'2':
+					hallado <- Falso
+					Escribir 'Ingrese el codigo a buscar: ' Sin Saltar
+					Leer cod_buscar
+					Para i <- 1 Hasta total Hacer
+						Si v_codigo[i] = cod_buscar Entonces
+							Escribir '--- EXPEDIENTE ENCONTRADO ---'
+							Escribir 'Codigo: ', v_codigo[i]
+							Escribir 'Remitente: ', v_remitente[i]
+							Escribir 'Asunto: ', v_asunto[i]
+							Escribir 'Estado: ', v_estado[i]
+							hallado <- Verdadero
+						FinSi
+					FinPara
+					Si NO hallado Entonces
+						Escribir 'No se encontro el expediente.'
+					FinSi
+				'3':
+					Escribir '--- BUSQUEDA AVANZADA ---'
+					Escribir 'Ingrese DNI o RUC a buscar: ' Sin Saltar
+					Leer doc_b
+					Para j <- 1 Hasta total Hacer
+						Si v_documento[j] = doc_b Entonces
+							Escribir '[', v_codigo[j], '] - ', v_remitente[j], ' | Estado: ', v_estado[j]
+						FinSi
+					FinPara
+				'4':
+					Escribir '--- LISTADO DE EXPEDIENTES ---'
+					Si total = 0 Entonces
+						Escribir 'No hay expedientes.'
+					SiNo
+						Para k <- 1 Hasta total Hacer
+							Escribir k, '. [', v_codigo[k], '] ', v_remitente[k], ' - Estado: ', v_estado[k]
+						FinPara
+					FinSi
+				'5':
+					Escribir 'Ingrese codigo del expediente a modificar estado: ' Sin Saltar
+					Leer cod_mod
+					Para m <- 1 Hasta total Hacer
+						Si v_codigo[m] = cod_mod Entonces
+							Escribir 'Estado actual: ', v_estado[m]
+							Escribir 'Nuevo estado (1. PENDIENTE / 2. APROBADO / 3. RECHAZADO): '
+							Leer est_op
+							Si est_op = '1' Entonces
+								v_estado[m] <- 'PENDIENTE'
+							FinSi
+							Si est_op = '2' Entonces
+								v_estado[m] <- 'APROBADO'
+							FinSi
+							Si est_op = '3' Entonces
+								v_estado[m] <- 'RECHAZADO'
+							FinSi
+							Escribir '[EXITO] Estado actualizado.'
+						FinSi
+					FinPara
+				'6':
+					Si rol_actual = 'ADMIN' Entonces
+						Escribir 'Ingrese el codigo del expediente a eliminar: ' Sin Saltar
+						Leer cod_mod
+						hallado <- Falso
+						Para m <- 1 Hasta total Hacer
+							Si v_codigo[m] = cod_mod Entonces
+								d <- m
+								hallado <- Verdadero
+							FinSi
+						FinPara
+						Si hallado Entonces
+							Para l <- d Hasta total - 1 Hacer
+								v_codigo[l] <- v_codigo[l+1]
+								v_documento[l] <- v_documento[l+1]
+								v_remitente[l] <- v_remitente[l+1]
+								v_asunto[l] <- v_asunto[l+1]
+								v_fecha[l] <- v_fecha[l+1]
+								v_estado[l] <- v_estado[l+1]
+								v_tipo[l] <- v_tipo[l+1]
+								v_area[l] <- v_area[l+1]
+								v_obs[l] <- v_obs[l+1]
+							FinPara
+							total <- total - 1
+							Escribir '[EXITO] Expediente eliminado correctamente.'
+						SiNo
+							Escribir '[ERROR] No se encontro el expediente.'
+						FinSi
+					SiNo
+						Escribir '[ACCESO DENEGADO]'
+					FinSi
+				'7':
+					Escribir '--- ESTADISTICAS ---'
+					Escribir 'Total de expedientes: ', total
+				'8':
+					Escribir '[EXITO] Datos exportados.'
+				'9':
+					Escribir '[EXITO] Backup generado.'
+				'10':
+					Escribir '--- AYUDA ---'
+					Escribir 'Sistema de Gestion de Mesa de Partes Municipal.'
+				'11':
+					Escribir 'Saliendo del sistema...'
+				De Otro Modo:
+					Escribir '[ERROR] Opcion no valida.'
+			FinSegun
+		SiNo
+			Segun opcion Hacer
+				'2':
+					Escribir 'Ingrese su codigo: ' Sin Saltar
+					Leer c_bus
+					Para x <- 1 Hasta total Hacer
+						Si v_codigo[x] = c_bus Entonces
+							Escribir 'Expediente: ', v_codigo[x], ' | Estado: ', v_estado[x]
+						FinSi
+					FinPara
+				'3':
+					Escribir 'Busqueda avanzada para ciudadano no disponible.'
+				'4':
+					Escribir 'Listado general restringido.'
+				'10':
+					Escribir 'Ayuda Ciudadano: Consulte con su codigo de tramite.'
+				'11':
+					Escribir 'Saliendo...'
+				De Otro Modo:
+					Escribir 'Opcion no valida.'
+			FinSegun
+		FinSi
+	Hasta Que opcion = '11'
+FinAlgoritmo
+
+Funcion rol <- login_sistema()
+	Definir rol_op Como Cadena
+	Escribir '=========================================='
+	Escribir '    CONTROL DE ACCESO - MUNI LIMA NORTE'
+	Escribir '=========================================='
+	Escribir '1. Administrador'
+	Escribir '2. Personal de Mesa de Partes'
+	Escribir '3. Ciudadano / Consulta'
+	Escribir 'Seleccione perfil (1-3): ' Sin Saltar
+	Leer rol_op
+	Si rol_op = '1' Entonces
+		rol <- 'ADMIN'
+	SiNo
+		Si rol_op = '2' Entonces
+			rol <- 'PERSONAL'
+		SiNo
+			rol <- 'CIUDADANO'
+		FinSi
+	FinSi
+FinFuncion`;
+
+    // Renderizar código con resaltado sintáctico
+    function renderizarCodigo() {
+      const lineas = codigoPsc.split('\n');
+      let html = '<table class="w-full text-left font-mono text-xs sm:text-sm border-collapse">';
+      
+      lineas.forEach((linea, idx) => {
+        let lineaEscapada = escapeHtml(linea);
+        
+        lineaEscapada = lineaEscapada
+          .replace(/\b(Algoritmo|FinAlgoritmo|Definir|Como|Dimensionar|Repetir|Hasta Que|Si|Entonces|SiNo|FinSi|Segun|Hacer|FinSegun|De Otro Modo|Para|Hasta|FinPara|Funcion|FinFuncion|Escribir|Leer|Sin Saltar)\b/g, '<span class="keyword">$1</span>')
+          .replace(/\b(Entero|Cadena|Logico|Real|Verdadero|Falso|NO|O)\b/g, '<span class="type">$1</span>')
+          .replace(/('([^'\\]|\\.)*')/g, '<span class="string">$1</span>')
+          .replace(/(\/\/.+$)/g, '<span class="comment">$1</span>')
+          .replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+
+        html += `<tr class="hover:bg-slate-900/60 transition">
+          <td class="pr-4 py-0.5 text-right text-slate-600 select-none w-10 text-[11px] align-top font-mono">${idx + 1}</td>
+          <td class="py-0.5 whitespace-pre align-top text-slate-200">${lineaEscapada}</td>
+        </tr>`;
+      });
+      
+      html += '</table>';
+      document.getElementById('codigo-html').innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Copiar Pseudocódigo
+    function copiarCodigo() {
+      navigator.clipboard.writeText(codigoPsc);
+      alert('¡Código PSeInt copiado al portapapeles!');
+    }
+
+    // Descargar .PSC
+    function descargarPSC() {
+      const blob = new Blob([codigoPsc], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'code.psc';
+      a.click();
+    }
+
+    window.onload = renderizarCodigo;
+  </script>
+</body>
+</html>
